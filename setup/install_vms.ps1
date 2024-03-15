@@ -1,4 +1,18 @@
 # Download & install all files
+#
+# Wireshark
+# Nmap
+# Balens
+# download Tails
+# Chrome
+# 
+#
+#
+#
+#
+#
+#
+
 
 # Define the source and destination paths
 $sourcePath = '\\instructor\share'
