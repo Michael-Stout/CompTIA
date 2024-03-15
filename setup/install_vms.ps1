@@ -1,3 +1,5 @@
+# Download & install all files
+
 # Define the source and destination paths
 $sourcePath = '\\instructor\share'
 $destinationPath = 'D:'
