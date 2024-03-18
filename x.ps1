@@ -2,20 +2,20 @@
 $sourcePath = '\\instructor\share'
 $destinationPath = 'D:'
 
-# Define path for "downloads" and "Virtual Machines" folders
-$downloadsFolderPath = Join-Path -Path $destinationPath -ChildPath "downloads"
+# Define path for "Class Downloads" and "Virtual Machines" folders
+$classDownloadsFolderPath = Join-Path -Path $destinationPath -ChildPath "Class Downloads"
 $vmFolderPath = Join-Path -Path $destinationPath -ChildPath "Virtual Machines"
 
-# Create "downloads" and "Virtual Machines" folders if they do not exist
-if (-not (Test-Path -Path $downloadsFolderPath)) {
-    New-Item -ItemType Directory -Path $downloadsFolderPath
+# Create "Class Downloads" and "Virtual Machines" folders if they do not exist
+if (-not (Test-Path -Path $classDownloadsFolderPath)) {
+    New-Item -ItemType Directory -Path $classDownloadsFolderPath
 }
 if (-not (Test-Path -Path $vmFolderPath)) {
     New-Item -ItemType Directory -Path $vmFolderPath
 }
 
-# Get all zip, exe, and iso files from the source directory
-$files = Get-ChildItem -Path $sourcePath -Include *.zip, *.exe, *.iso -Recurse -File
+# Get all files from the source directory
+$files = Get-ChildItem -Path $sourcePath -Recurse -File
 
 # Initialize progress variables
 $totalFiles = $files.Count
@@ -32,10 +32,10 @@ foreach ($file in $files) {
     # Show progress
     Write-Progress -Activity "Processing files..." -Status "$currentFileIndex of $totalFiles" -PercentComplete $percentageComplete
 
-    # Define the destination path for the file within the "downloads" folder
-    $destinationFilePath = Join-Path -Path $downloadsFolderPath -ChildPath $file.Name
+    # Define the destination path for the file within the "Class Downloads" folder
+    $destinationFilePath = Join-Path -Path $classDownloadsFolderPath -ChildPath $file.Name
 
-    # Copy the file to the "downloads" folder
+    # Copy the file to the "Class Downloads" folder
     Copy-Item -Path $file.FullName -Destination $destinationFilePath
 
     # If the file is a zip file, extract it to the "Virtual Machines" folder
@@ -51,4 +51,4 @@ foreach ($file in $files) {
 }
 
 # Final message
-Write-Output "All files have been processed. Zip files extracted to the Virtual Machines folder. Exe and Iso files copied to the downloads folder."
+Write-Output "All files have been processed. Zip files extracted to the Virtual Machines folder. Other files copied to the Class Downloads folder."
