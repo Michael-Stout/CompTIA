@@ -8,50 +8,57 @@ Write-Output "Windows Defender Firewall has been turned off for all profiles."
 $sourcePath = '\\instructor\share'
 $destinationPath = 'D:'
 
-# Define paths for "Zips" and "Virtual Machines" folders
-$zipsFolderPath = Join-Path -Path $destinationPath -ChildPath "Zips"
+# Define paths for "Class Downloads" and "Virtual Machines" folders
+$classDownloadsFolderPath = Join-Path -Path $destinationPath -ChildPath "Class Downloads"
 $vmFolderPath = Join-Path -Path $destinationPath -ChildPath "Virtual Machines"
 
-# Create "Zips" and "Virtual Machines" folders if they do not exist
-if (-not (Test-Path -Path $zipsFolderPath)) {
-    New-Item -ItemType Directory -Path $zipsFolderPath
+# Create "Class Downloads" and "Virtual Machines" folders if they do not exist
+if (-not (Test-Path -Path $classDownloadsFolderPath)) {
+    New-Item -ItemType Directory -Path $classDownloadsFolderPath
 }
 if (-not (Test-Path -Path $vmFolderPath)) {
     New-Item -ItemType Directory -Path $vmFolderPath
 }
 
-# Get all zip files from the source directory
-$zipFiles = Get-ChildItem -Path $sourcePath -Filter *.zip -Recurse -File
+# Get all files (not just .zip) from the source directory
+$allFiles = Get-ChildItem -Path $sourcePath -Recurse -File
 
-# Initialize progress variables
-$totalFiles = $zipFiles.Count
-$currentFileIndex = 0
+# Copy each file to the "Class Downloads" folder
+foreach ($file in $allFiles) {
+    $destinationPath = Join-Path -Path $classDownloadsFolderPath -ChildPath $file.Name
+    Copy-Item -Path $file.FullName -Destination $destinationPath
+    Write-Output "Copied: $file.Name to $classDownloadsFolderPath"
+}
 
-# Process each zip file
-foreach ($file in $zipFiles) {
-    # Update current file index
-    $currentFileIndex++
-    
-    # Calculate the percentage completion
-    $percentageComplete = ($currentFileIndex / $totalFiles) * 100
+# Filter to get only zip files for extraction
+$zipFiles = $allFiles | Where-Object { $_.Extension -eq '.zip' }
 
-    # Show progress
-    Write-Progress -Activity "Processing files..." -Status "$currentFileIndex of $totalFiles" -PercentComplete $percentageComplete
+# Initialize progress variables for extraction
+$totalZipFiles = $zipFiles.Count
+$currentZipFileIndex = 0
 
-    # Define the destination path for the zip file within the "Zips" folder
-    $destinationZipPath = Join-Path -Path $zipsFolderPath -ChildPath $file.Name
+# Extract each zip file
+foreach ($zipFile in $zipFiles) {
+    # Update current file index for extraction
+    $currentZipFileIndex++
 
-    # Copy the zip file to the "Zips" folder
-    Copy-Item -Path $file.FullName -Destination $destinationZipPath
+    # Calculate the percentage completion for extraction
+    $percentageComplete = ($currentZipFileIndex / $totalZipFiles) * 100
+
+    # Show progress for extraction
+    Write-Progress -Activity "Extracting .zip files..." -Status "$currentZipFileIndex of $totalZipFiles" -PercentComplete $percentageComplete
+
+    # Define the destination path for the zip file within the "Class Downloads" folder
+    $destinationZipPath = Join-Path -Path $classDownloadsFolderPath -ChildPath $zipFile.Name
 
     # Define the extraction path within the "Virtual Machines" folder, maintaining the zip file's name without extension
-    $extractionPath = Join-Path -Path $vmFolderPath -ChildPath $file.BaseName
+    $extractionPath = Join-Path -Path $vmFolderPath -ChildPath $zipFile.BaseName
 
     # Extract the zip file to the designated "Virtual Machines" folder path
     Expand-Archive -Path $destinationZipPath -DestinationPath $extractionPath -Force
 
-    Write-Output "Extracted: $file.Name to $extractionPath"
+    Write-Output "Extracted: $zipFile.Name to $extractionPath"
 }
 
 # Final message
-Write-Output "All zip files have been processed and extracted to the Virtual Machines folder."
+Write-Output "All files have been copied to the Class Downloads folder. All zip files have been extracted to the Virtual Machines folder."
