@@ -1,6 +1,6 @@
-# Define the folder name and path
+# Define the folder name and path directly on the F drive
 $folderName = "Share"
-$folderPath = Join-Path -Path (Get-Location) -ChildPath $folderName
+$folderPath = "F:\$folderName" # This line is modified to point to the F drive
 
 # Create the folder if it doesn't already exist
 if (-not (Test-Path -Path $folderPath)) {
@@ -33,4 +33,4 @@ $acl.AddAccessRule($accessRule)
 # Apply the NTFS permissions to the folder
 Set-Acl -Path $folderPath -AclObject $acl
 
-Write-Host "Folder '$folderName' has been created and shared with specified permissions."
+Write-Host "Folder '$folderName' has been created and shared on the F drive with specified permissions."
